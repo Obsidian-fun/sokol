@@ -61,6 +61,7 @@ void frame (void) {
 		.swapchain = sglue_swapchain()
 	};
 	sg_begin_pass(&pass); 
+
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 	sg_draw(0,3,1); // sg_draw(int base_element, int num_elements, int num_instances) 
