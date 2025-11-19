@@ -6,8 +6,8 @@
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
-#include "myshader.glsl.h"
 #include "sokol_log.h"
+#include "triangle-sapp.glsl.h"
 
 using namespace std;
 
@@ -43,13 +43,13 @@ static void init (void) {
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_description);
 	/*create a pipeline object (default render states are fine for triangle) */
 	sg_pipeline_desc pipeline_description =  {
-			.shader = shd,
+		.shader = shd,
 			/*if the vertex layout doesn't have gaps, don't need to provide strides and offsets */
-	//		.layout = {
-	//			.attrs = {
-	//				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
-	//			}
-	//		},
+//		.layout = {
+//			.attrs = {
+//				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
+//			}
+//		},
 		.label = "triangle-pipeline"
 	};
 	state.pip = sg_make_pipeline(&pipeline_description);
