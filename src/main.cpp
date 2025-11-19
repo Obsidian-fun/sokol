@@ -32,12 +32,24 @@ static void init (void) {
 		0.5f, -0.5f, 0.0f,		// bottom right
 		0.0f, 0.5f, 0.0f		// top 
 	}
-
 	state.bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc) {
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
 		.label = "triangle_vertices"
 	});
+
+	/*create a pipeline object (default render states are fine for triangle) */
+	state.pip = sg_make_pipeline(&(sg_pipeline_desc) {
+		.shader = shd,
+		/*if the vertex layout doesn't have gaps, don't need to provide strides and offsets */
+		.layout = {
+			.attrs = {
+				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
+			}
+		}
+	})
+
+
 
 
 	state.pass_action = (sg_pass_action){};
