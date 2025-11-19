@@ -7,7 +7,7 @@
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
 #include "sokol_log.h"
-#include "triangle-sapp.glsl.h"
+#include "triangle-sapp.glsl"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ static void init (void) {
 	sg_setup(&desc);
 
  /* create shader from code-generated sg_shader_desc */
-	sg_shader shd = sg_make_shader(myshader_shader_desc(sg_query_backend()));
+	sg_shader shd = sg_make_shader(triangle-sapp(sg_query_backend()));
 
  /* a vertex buffer with 3 vertices */
 	float vertices[] = {
