@@ -46,7 +46,8 @@ static void init (void) {
 			.attrs = {
 				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
 			}
-		}
+		},
+		.label = "triangle-pipeline"
 	})
 
 
