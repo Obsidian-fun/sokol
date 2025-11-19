@@ -50,9 +50,6 @@ static void init (void) {
 		.label = "triangle-pipeline"
 	})
 
-
-
-
 	state.pass_action = (sg_pass_action){};
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
@@ -64,6 +61,10 @@ void frame (void) {
 		.swapchain = sglue_swapchain()
 	};
 	sg_begin_pass(&pass); 
+	sg_apply_pipeline(state.pip);
+	sg_apply_bindings(&state.bind);
+	sg_draw(0,3,1); // sg_draw(int base_element, int num_elements, int num_instances) 
+
 	sg_end_pass();
 	sg_commit();
 }
