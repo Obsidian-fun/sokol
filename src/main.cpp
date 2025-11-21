@@ -7,7 +7,7 @@
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
 #include "sokol_log.h"
-#include "triangle-sapp.glsl"
+#include "1-triangle.glsl.h"
 
 using namespace std;
 
@@ -25,14 +25,14 @@ static void init (void) {
 	sg_setup(&desc);
 
  /* create shader from code-generated sg_shader_desc */
-	sg_shader shd = sg_make_shader(triangle-sapp(sg_query_backend()));
+	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
 
  /* a vertex buffer with 3 vertices */
 	float vertices[] = {
-		/*pos						color */			
-		-0.5f,-0.5f, 		0.0f, // bottom left
-		0.5f, -0.5f, 		0.0f,		// bottom right
-		0.0f, 0.5f, 		0.0f		// top 
+		/*postion */						
+		-0.5f,-0.5f, 0.0f, 	// bottom left
+		0.5f, -0.5f, 0.0f,	// bottom right
+		0.0f, 0.5f, 0.0f		// top 
 	};
 
 	sg_buffer_desc buffer_description = {
@@ -45,11 +45,11 @@ static void init (void) {
 	sg_pipeline_desc pipeline_description =  {
 		.shader = shd,
 			/*if the vertex layout doesn't have gaps, don't need to provide strides and offsets */
-//		.layout = {
-//			.attrs = {
-//				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
-//			}
-//		},
+		.layout = {
+			.attrs = {
+				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
+			}
+		},
 		.label = "triangle-pipeline"
 	};
 	state.pip = sg_make_pipeline(&pipeline_description);
@@ -64,11 +64,9 @@ void frame (void) {
 		.swapchain = sglue_swapchain()
 	};
 	sg_begin_pass(&pass); 
-
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 	sg_draw(0,3,1); // sg_draw(int base_element, int num_elements, int num_instances) 
-
 	sg_end_pass();
 	sg_commit();
 }
