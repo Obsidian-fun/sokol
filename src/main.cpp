@@ -21,11 +21,13 @@ static void init (void) {
 		.environment = sglue_environment
 	};
 	sg_setup(sg_desc);
-	
-	
-
-
-
+	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f, // botton left
+		0.5f, -0.5f,	0.0f, // bottom right
+		0.5f,	0.5f,		0.0f, // top right
+		-0.5f, 0.5f,	0.0f  // top left
+	}
 
 
 
