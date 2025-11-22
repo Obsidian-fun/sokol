@@ -7,12 +7,10 @@
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
 #include "sokol_log.h"
-#include "1-triangle.glsl.h"
-
-using namespace std;
+// shader goes here
 
 static struct {
-	sg_pipeline pip; 
+	sg_pipeline pip;
 	sg_bindings bind;
 	sg_pass_action pass_action;
 } state;
@@ -20,86 +18,22 @@ static struct {
 static void init (void) {
 	sg_desc desc = {
 		.logger = {.func = slog_func},
-		.environment = sglue_environment()
+		.environment = sglue_environment
 	};
-	sg_setup(&desc);
+	sg_setup(sg_desc);
+	
 
- /* create shader from code-generated sg_shader_desc */
-	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
 
- /* a vertex buffer with 3 vertices */
-	float vertices[] = {
-		/*postion */						
-		-0.5f,-0.5f, 0.0f, 	// bottom left
-		0.5f, -0.5f, 0.0f,	// bottom right
-		0.0f, 0.5f, 0.0f		// top 
-	};
 
-	sg_buffer_desc buffer_description = {
-		.size = sizeof(vertices),
-		.data = SG_RANGE(vertices),
-		.label = "triangle_vertices"
-	};
-	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_description);
-	/*create a pipeline object (default render states are fine for triangle) */
-	sg_pipeline_desc pipeline_description =  {
-		.shader = shd,
-			/*if the vertex layout doesn't have gaps, don't need to provide strides and offsets */
-		.layout = {
-			.attrs = {
-				[ATTR_simple_position].format = SG_VERTEXFORMAT_FLOAT3
-			}
-		},
-		.label = "triangle-pipeline"
-	};
-	state.pip = sg_make_pipeline(&pipeline_description);
-	state.pass_action = (sg_pass_action){};
-	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
+
+
+
+
+
+
+
+
+
 }
-
-void frame (void) {
-	sg_pass pass = {
-		.action = state.pass_action,
-		.swapchain = sglue_swapchain()
-	};
-	sg_begin_pass(&pass); 
-	sg_apply_pipeline(state.pip);
-	sg_apply_bindings(&state.bind);
-	sg_draw(0,3,1); // sg_draw(int base_element, int num_elements, int num_instances) 
-	sg_end_pass();
-	sg_commit();
-}
-
-void cleanup(void) {
-	sg_shutdown();
-}
-
-void event(const sapp_event* e) {
-	if (e->type == SAPP_EVENTTYPE_KEY_DOWN) {
-		if (e->key_code == SAPP_KEYCODE_ESCAPE) {
-			sapp_request_quit();
-		}
-	}
-}
-
-sapp_desc sokol_main(int argc, char *argv[]) {
-	return (sapp_desc) {
-		.init_cb = init,
-		.frame_cb = frame,
-		.cleanup_cb = cleanup,
-		.event_cb = event,
-		.width = 800,
-		.height = 600,
-		.high_dpi = true,
-		.window_title = "First Triangle"
-	};
-}
-
-
-
-
-
-
 
 
