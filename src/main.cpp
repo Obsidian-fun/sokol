@@ -18,28 +18,39 @@ static struct {
 static void init (void) {
 	sg_desc desc = {
 		.logger = {.func = slog_func},
-		.environment = sglue_environment
+		.environment = sglue_environment()
 	};
-	sg_setup(sg_desc);
+	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f, // botton left
 		0.5f, -0.5f,	0.0f, // bottom right
 		0.5f,	0.5f,		0.0f, // top right
 		-0.5f, 0.5f,	0.0f  // top left
-	}
-	sg_buffer_desc buffer_desc = {
+	};
+	sg_buffer_desc buffer_desc_vertex = {
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
-		.label = "quadrilateral_vertices"
-	}
-	unin16_t indices[] = {
+		.label = "quad_vertices"
+	};
+	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc_vertex);
+	uint16_t indices[] = {
 		0,1,3,
 		1,2,3
-	}	
-	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
+	};
+	sg_buffer_desc buffer_desc_indices = {	
+		.size = sizeof(indices),
+		.usage = {
+			.index_buffer = true,
+			.immutable = true
+		},	
+		.data = SG_RANGE(indices),
+		.label = "quad_indices"
+	};
+	state.bind.index_buffer = sg_make_buffer(&buffer_desc_indices);
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
+		.index_type = SG_INDEXTYPE_UINT16,
 		.layout = {
 			.attrs = {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
@@ -50,7 +61,7 @@ static void init (void) {
 	state.pip = sg_make_pipeline(&pipeline_desc); 
 	state.pass_action = (sg_pass_action){};
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-	state.pass_action.coloros[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
+	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
 }
 
 void frame(void) {
@@ -72,7 +83,7 @@ void cleanup(void) {
 
 void event(const sapp_event* e) {
 	if (e->type == SAPP_EVENTTYPE_KEY_DOWN) {
-		if (e->type == SAPP_KEYCODE_ESCAPE) {
+		if (e->key_code == SAPP_KEYCODE_ESCAPE) {
 			sapp_request_quit();
 		}
 	}
