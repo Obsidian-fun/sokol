@@ -7,7 +7,7 @@
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
 #include "sokol_log.h"
-// shader goes here
+#include "2-quad.glsl.h"
 
 static struct {
 	sg_pipeline pip;
@@ -28,14 +28,66 @@ static void init (void) {
 		0.5f,	0.5f,		0.0f, // top right
 		-0.5f, 0.5f,	0.0f  // top left
 	}
-
-
-
-
-
-
-
-
+	sg_buffer_desc buffer_desc = {
+		.size = sizeof(vertices),
+		.data = SG_RANGE(vertices),
+		.label = "quadrilateral_vertices"
+	}
+	unin16_t indices[] = {
+		0,1,3,
+		1,2,3
+	}	
+	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
+	sg_pipeline_desc pipeline_desc = {
+		.shader = shd,
+		.layout = {
+			.attrs = {
+				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
+			}
+		},
+		.label = "quadrilateral_position"
+	};
+	state.pip = sg_make_pipeline(&pipeline_desc); 
+	state.pass_action = (sg_pass_action){};
+	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+	state.pass_action.coloros[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
 }
 
+void frame(void) {
+	sg_pass pass {
+		.action = state.pass_action,
+		.swapchain = sglue_swapchain()
+	};
+	sg_begin_pass(&pass);
+	sg_apply_pipeline(state.pip);
+	sg_apply_bindings(&state.bind);
+	sg_draw(0, 6, 1);
+	sg_end_pass();
+	sg_commit();
+}
+	
+void cleanup(void) {
+	sg_shutdown();
+}
+
+void event(const sapp_event* e) {
+	if (e->type == SAPP_EVENTTYPE_KEY_DOWN) {
+		if (e->type == SAPP_KEYCODE_ESCAPE) {
+			sapp_request_quit();
+		}
+	}
+}
+
+sapp_desc sokol_main(int argc, char *argv[]) {
+  return (sapp_desc) {
+    .init_cb = init,
+    .frame_cb = frame,
+    .cleanup_cb = cleanup,
+    .event_cb = event,
+    .width = 800,
+    .height = 600,
+    .high_dpi = true,
+    .window_title = "First Quad"
+  };
+}
 
