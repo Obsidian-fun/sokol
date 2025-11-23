@@ -1,4 +1,4 @@
-
+/* rendering a quadrilateral */
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
@@ -35,8 +35,8 @@ static void init (void) {
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices[] = {
-		0, 1, 1, 3, 3, 0,    // first triangle
-    1, 2, 2, 3, 3, 1 		 // second triangle
+		0,1,3,
+		1,2,3
 	};
 	buffer_desc = {	
 		.size = sizeof(indices),
@@ -55,7 +55,6 @@ static void init (void) {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
 			}
 		},
-		.primitive_type = SG_PRIMITIVETYPE_LINES,
 		.index_type = SG_INDEXTYPE_UINT16,
 		.label = "quadrilateral_position"
 	};
@@ -63,6 +62,7 @@ static void init (void) {
 	state.pass_action = (sg_pass_action){};
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
+
 }
 
 void frame(void) {
@@ -73,7 +73,7 @@ void frame(void) {
 	sg_begin_pass(&pass);
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
-	sg_draw(0, 12, 1);
+	sg_draw(0, 6, 1);
 	sg_end_pass();
 	sg_commit();
 }

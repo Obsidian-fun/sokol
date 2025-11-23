@@ -1,4 +1,4 @@
-
+/* wireframe model of a quadrilateral */
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
