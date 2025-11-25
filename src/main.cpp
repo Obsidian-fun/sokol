@@ -1,4 +1,4 @@
-
+/* stock ticker - bullish OHLC */
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
@@ -22,11 +22,13 @@ static void init (void) {
 	};
 	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
-	float vertices[] = {
-		-0.5f, -0.5f, 0.0f, // botton left
-		0.5f, -0.5f,	0.0f, // bottom right
-		0.5f,	0.5f,		0.0f, // top right
-		-0.5f, 0.5f,	0.0f  // top left
+	float vertices[] = { 
+		-0.5f, -1.0f, 0.0f, // Open - left corner
+		0.5f, -1.0f, 0.0f,	// Open - righet corner
+		-0.5f, 1.0f, 0.0f,	// Close - left corner
+		0.5f, 1.0f,	0.0f,		// Close - right corner
+		0.0f, 1.0f, 0.0f, 	// High 
+		0.0f, -1.0f, 0.0f 	// Low
 	};
 	sg_buffer_desc buffer_desc = {
 		.size = sizeof(vertices),
