@@ -23,12 +23,13 @@ static void init (void) {
 	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = { 
-		-0.5f, -1.0f, 0.0f, // Open - left corner
-		0.5f, -1.0f, 0.0f,	// Open - righet corner
-		-0.5f, 1.0f, 0.0f,	// Close - left corner
-		0.5f, 1.0f,	0.0f,		// Close - right corner
-		0.0f, 1.0f, 0.0f, 	// High 
-		0.0f, -1.0f, 0.0f 	// Low
+		0.0f, 0.0f, 0.0f,		// center
+		-0.25f, -0.5f, 0.0f, // Open - left corner
+		0.25f, -0.5f, 0.0f,	// Open - righet corner
+		-0.25f, 0.5f, 0.0f,	// Close - left corner
+		0.25f, 0.25f,	0.0f,		// Close - right corner
+		0.0f, 0.5f, 0.0f, 	// High 
+		0.0f, -0.5f, 0.0f 	// Low
 	};
 	sg_buffer_desc buffer_desc = {
 		.size = sizeof(vertices),
@@ -37,8 +38,8 @@ static void init (void) {
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices[] = {
-		0, 1, 1, 3, 3, 0,    // first triangle
-    1, 2, 2, 3, 3, 1 		 // second triangle
+		1,2,2,3,3,1	
+
 	};
 	buffer_desc = {	
 		.size = sizeof(indices),
@@ -75,7 +76,7 @@ void frame(void) {
 	sg_begin_pass(&pass);
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
-	sg_draw(0, 12, 1);
+	sg_draw(0, 6, 1);
 	sg_end_pass();
 	sg_commit();
 }
@@ -99,9 +100,9 @@ sapp_desc sokol_main(int argc, char *argv[]) {
     .cleanup_cb = cleanup,
     .event_cb = event,
     .width = 800,
-    .height = 600,
+    .height = 800,
     .high_dpi = true,
-    .window_title = "First Quad"
+    .window_title = "Stock Ticker"
   };
 }
 
