@@ -22,15 +22,27 @@ static void init (void) {
 	};
 	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
-	float vertices[] = { 
-		0.0f, 0.0f, 0.0f,		// center
+	float triangle_vertices[] = {
 		-0.25f, -0.5f, 0.0f, // Open - left corner
 		0.25f, -0.5f, 0.0f,	// Open - righet corner
 		-0.25f, 0.5f, 0.0f,	// Close - left corner
 		0.25f, 0.5f,	0.0f,		// Close - right corner
+	}
+
+	float line_vertices[] = { 
+		0.0f, 0.0f, 0.0f,		// center
 		0.0f, 0.7f, 0.0f, 	// High 
 		0.0f, -0.7f, 0.0f 	// Low
 	};
+
+
+
+
+
+
+
+
+
 	sg_buffer_desc buffer_desc = {
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
@@ -50,7 +62,7 @@ static void init (void) {
 			.immutable = true
 		},	
 		.data = SG_RANGE(indices),
-		.label = "quad_indices"
+		.label = "ticker_indices"
 	};
 	state.bind.index_buffer = sg_make_buffer(&buffer_desc);
 	sg_pipeline_desc pipeline_desc = {
@@ -62,7 +74,7 @@ static void init (void) {
 		},
 		.primitive_type = SG_PRIMITIVETYPE_LINES,
 		.index_type = SG_INDEXTYPE_UINT16,
-		.label = "quadrilateral_position"
+		.label = "ticker_position"
 	};
 	state.pip = sg_make_pipeline(&pipeline_desc); 
 	state.pass_action = (sg_pass_action){};
