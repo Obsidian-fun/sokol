@@ -9,11 +9,15 @@
 #include "sokol_log.h"
 #include "2-quad.glsl.h"
 
+/***
+creating 2 pipelines for quadrilateral and 2 lines. Each pipeline needs it's own binding for index_data in
+the buffer object. So there will be 2 draw calls, one for a quad and one for 2 lines.
+***/
 static struct {
-	sg_pipeline pip;
-	sg_bindings bind;
-	sg_buffer quad;
-	sg_buffer line;
+	sg_pipeline pip_quad;
+	sg_pipeline pip_line;
+	sg_bindings bind_quad;
+	sg_bindings bind_line;
 	sg_pass_action pass_action;
 } state;
 
@@ -40,26 +44,37 @@ static void init (void) {
 		.label = "ticker_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
-	uint16_t indices[] = {
-		0, 1, 2,
-		2, 3, 1
+	uint16_t indices_quad[] = {
+		0, 1, 2, // Left triangle
+		2, 3, 1  // Right triangle
 	};
-
+	// TODO ensure common vertex buffer
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
-	uint16_t indices[] = {
-		0,5,
-		0,6
+	uint16_t indices_line[] = {
+		0,5,	// high point for the day
+		0,6		// low point for the day
 	};
 	buffer_desc = {	
-		.size = sizeof(indices),
+		.size = sizeof(indices_quad),
 		.usage = {
 			.index_buffer = true,
 			.immutable = true
 		},	
-		.data = SG_RANGE(indices),
-		.label = "ticker_indices"
+		.data = SG_RANGE(indices_quad),
+		.label = "quad_indices"
 	};
-	state.bind.index_buffer = sg_make_buffer(&buffer_desc);
+	state.bind_quad.index_buffer = sg_make_buffer(&buffer_desc);
+
+	buffer_desc = {	
+		.size = sizeof(indices_line),
+		.usage = {
+			.index_buffer = true,
+			.immutable = true
+		},	
+		.data = SG_RANGE(indices_line),
+		.label = "line_indices"
+	};
+	state.bind_line.index_buffer = sg_make_buffer(&buffer_desc);
 
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
@@ -68,11 +83,24 @@ static void init (void) {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
 			}
 		},
+		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
+		.label = "quad_position"
+	};
+	state.pip_quad = sg_make_pipeline(&pipeline_desc); 
+
+	pipeline_desc = {
+		.shader = shd,
+		.layout = {
+			.attrs = {
+				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
+			}
+		},
 		.primitive_type = SG_PRIMITIVETYPE_LINES,
 		.index_type = SG_INDEXTYPE_UINT16,
-		.label = "ticker_position"
+		.label = "line_position"
 	};
-	state.pip = sg_make_pipeline(&pipeline_desc); 
+	state.pip_line = sg_make_pipeline(&pipeline_desc); 
+
 	state.pass_action = (sg_pass_action){};
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
