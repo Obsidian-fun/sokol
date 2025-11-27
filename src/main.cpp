@@ -37,24 +37,22 @@ static void init (void) {
 		0.0f, 0.7f, 0.0f, 		// 5: High 
 		0.0f, -0.7f, 0.0f 		// 6: Low
 	};
-	// for quad,
-	sg_buffer_desc buffer_desc = {
+	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
 		.label = "ticker_vertices"
 	};
-	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
+	state.bind_quad.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
+	state.bind_line.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices_quad[] = {
 		0, 1, 2, // Left triangle
 		2, 3, 1  // Right triangle
 	};
-	// TODO ensure common vertex buffer
-	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices_line[] = {
 		0,5,	// high point for the day
 		0,6		// low point for the day
 	};
-	buffer_desc = {	
+	buffer_desc = {							// loading up index data from buffer object
 		.size = sizeof(indices_quad),
 		.usage = {
 			.index_buffer = true,
@@ -64,7 +62,6 @@ static void init (void) {
 		.label = "quad_indices"
 	};
 	state.bind_quad.index_buffer = sg_make_buffer(&buffer_desc);
-
 	buffer_desc = {	
 		.size = sizeof(indices_line),
 		.usage = {
@@ -76,6 +73,7 @@ static void init (void) {
 	};
 	state.bind_line.index_buffer = sg_make_buffer(&buffer_desc);
 
+	// 2 pipeline structs,
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
 		.layout = {
@@ -87,7 +85,6 @@ static void init (void) {
 		.label = "quad_position"
 	};
 	state.pip_quad = sg_make_pipeline(&pipeline_desc); 
-
 	pipeline_desc = {
 		.shader = shd,
 		.layout = {
@@ -112,9 +109,15 @@ void frame(void) {
 		.swapchain = sglue_swapchain()
 	};
 	sg_begin_pass(&pass);
-	sg_apply_pipeline(state.pip);
-	sg_apply_bindings(&state.bind);
-	sg_draw(0, 16, 1);
+
+	sg_apply_pipeline(state.pip_quad);
+	sg_apply_bindings(&state.bind_quad);
+	sg_draw(0, 6, 1);
+
+	sg_apply_pipeline(state.pip_line);
+	sg_apply_bindings(&state.bind_line);
+	sg_draw(0, 4, 1);
+
 	sg_end_pass();
 	sg_commit();
 }
