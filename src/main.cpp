@@ -12,6 +12,8 @@
 static struct {
 	sg_pipeline pip;
 	sg_bindings bind;
+	sg_buffer quad;
+	sg_buffer line;
 	sg_pass_action pass_action;
 } state;
 
@@ -33,9 +35,9 @@ static void init (void) {
 	};
 	// for quad,
 	sg_buffer_desc buffer_desc = {
-		.size = sizeof(triangle_vertices),
-		.data = SG_RANGE(triangle_vertices),
-		.label = "quad_vertices"
+		.size = sizeof(vertices),
+		.data = SG_RANGE(vertices),
+		.label = "ticker_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices[] = {
@@ -58,6 +60,7 @@ static void init (void) {
 		.label = "ticker_indices"
 	};
 	state.bind.index_buffer = sg_make_buffer(&buffer_desc);
+
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
 		.layout = {
