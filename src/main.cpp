@@ -33,9 +33,8 @@ static void init (void) {
 		0.25f, -0.5f, 0.0f,		// 1: Open - righet corner
 		-0.25f, 0.5f, 0.0f,		// 2: Close - left corner
 		0.25f, 0.5f,	0.0f,		// 3: Close - right corner
-		0.0f, 0.0f, 0.0f			// 4: center of ticker
-		0.0f, 0.7f, 0.0f, 		// 5: High 
-		0.0f, -0.7f, 0.0f 		// 6: Low
+		0.0f, 0.7f, 0.0f, 		// 4: High 
+		0.0f, -0.7f, 0.0f 		// 5: Low
 	};
 	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
@@ -49,8 +48,7 @@ static void init (void) {
 		2, 3, 1  // Right triangle
 	};
 	uint16_t indices_line[] = {
-		4,5,	// high point for the day
-		4,6		// low point for the day
+		4,5,	// high to low point for the day
 	};
 	buffer_desc = {							// loading up index data from buffer object
 		.size = sizeof(indices_quad),
@@ -117,7 +115,7 @@ void frame(void) {
 
 	sg_apply_pipeline(state.pip_line);
 	sg_apply_bindings(&state.bind_line);
-	sg_draw(0, 4, 1);
+	sg_draw(0, 2, 1);
 
 	sg_end_pass();
 	sg_commit();
