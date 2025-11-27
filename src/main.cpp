@@ -49,8 +49,8 @@ static void init (void) {
 		2, 3, 1  // Right triangle
 	};
 	uint16_t indices_line[] = {
-		0,5,	// high point for the day
-		0,6		// low point for the day
+		4,5,	// high point for the day
+		4,6		// low point for the day
 	};
 	buffer_desc = {							// loading up index data from buffer object
 		.size = sizeof(indices_quad),
@@ -82,6 +82,7 @@ static void init (void) {
 			}
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
+		.index_type = SG_INDEXTYPE_UINT16,
 		.label = "quad_position"
 	};
 	state.pip_quad = sg_make_pipeline(&pipeline_desc); 
