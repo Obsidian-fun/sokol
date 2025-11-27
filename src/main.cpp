@@ -33,7 +33,7 @@ static void init (void) {
 		0.25f, -0.5f, 0.0f,		// 1: Open - righet corner
 		-0.25f, 0.5f, 0.0f,		// 2: Close - left corner
 		0.25f, 0.5f,	0.0f,		// 3: Close - right corner
-		0.0f, 0.0f, 0.0f,			// 4: center
+		0.0f, 0.0f, 0.0f			// 4: center of ticker
 		0.0f, 0.7f, 0.0f, 		// 5: High 
 		0.0f, -0.7f, 0.0f 		// 6: Low
 	};
