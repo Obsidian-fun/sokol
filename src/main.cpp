@@ -22,36 +22,29 @@ static void init (void) {
 	};
 	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
-	float triangle_vertices[] = {
-		-0.25f, -0.5f, 0.0f, // Open - left corner
-		0.25f, -0.5f, 0.0f,	// Open - righet corner
-		-0.25f, 0.5f, 0.0f,	// Close - left corner
-		0.25f, 0.5f,	0.0f,		// Close - right corner
-	}
-
-	float line_vertices[] = { 
-		0.0f, 0.0f, 0.0f,		// center
-		0.0f, 0.7f, 0.0f, 	// High 
-		0.0f, -0.7f, 0.0f 	// Low
+	float vertices[] = {
+		-0.25f, -0.5f, 0.0f,	// 0: Open - left corner
+		0.25f, -0.5f, 0.0f,		// 1: Open - righet corner
+		-0.25f, 0.5f, 0.0f,		// 2: Close - left corner
+		0.25f, 0.5f,	0.0f,		// 3: Close - right corner
+		0.0f, 0.0f, 0.0f,			// 4: center
+		0.0f, 0.7f, 0.0f, 		// 5: High 
+		0.0f, -0.7f, 0.0f 		// 6: Low
 	};
-
-
-
-
-
-
-
-
-
+	// for quad,
 	sg_buffer_desc buffer_desc = {
-		.size = sizeof(vertices),
-		.data = SG_RANGE(vertices),
+		.size = sizeof(triangle_vertices),
+		.data = SG_RANGE(triangle_vertices),
 		.label = "quad_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 	uint16_t indices[] = {
-		1,2,2,3,3,1, // first triangle
-		3,4,4,2,2,3,	 // second triangle
+		0, 1, 2,
+		2, 3, 1
+	};
+
+	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
+	uint16_t indices[] = {
 		0,5,
 		0,6
 	};
