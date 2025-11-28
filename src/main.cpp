@@ -3,11 +3,11 @@
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
 
-#include "sokol_app.h"
-#include "sokol_gfx.h"
-#include "sokol_glue.h"
-#include "sokol_log.h"
-#include "2-quad.glsl.h"
+#include "header/sokol_app.h"
+#include "header/sokol_gfx.h"
+#include "header/sokol_glue.h"
+#include "header/sokol_log.h"
+#include "header/2-quad.glsl.h"
 
 /***
 creating 2 pipelines for quadrilateral and 2 lines. Each pipeline needs it's own binding for index_data in
