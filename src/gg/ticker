@@ -1,0 +1,202 @@
+### Problems in your current code:
+1. You're trying to draw **triangles (for body)** and **lines (for wicks)** with the **same pipeline** → but one uses `SG_PRIMITIVETYPE_TRIANGLES` and the other `SG_PRIMITIVETYPE_LINES`
+2. You created **only one pipeline** set to `LINES`, so the quad won't render properly
+3. You overwrote `vertex_buffers[0]` twice
+4. Index buffer setup is incomplete and incorrect
+5. You're not using instancing or multiple primitives efficiently
+
+---
+
+### Best Solution: **One draw call per candlestick using two pipelines + same bindings**
+
+You **cannot** combine `TRIANGLES` and `LINES` in a single `sg_draw()` call unless you use:
+- Geometry shaders (not available in sokol_gfx easily), or
+- A single vertex buffer with primitive restart or multiple index ranges (complex)
+
+So the **standard, clean, performant way** with sokol_gfx is:
+
+### Recommended Approach (1 draw call per candle → 2 sg_draw() total per candle)
+
+```cpp
+// Use TWO pipelines: one for body (triangles), one for wick (lines)
+// But share the SAME vertex/index buffers where possible
+```
+
+Here’s a **corrected and working** version for **one bullish/bearish candlestick** with **only 2 draw calls** (optimal):
+
+```cpp
+#include "sokol_app.h"
+#include "sokol_gfx.h"
+#include "sokol_glue.h"
+#include "sokol_log.h"
+
+// Simple passthrough shader
+static const char* vs_src = R"(
+#version 330
+in vec3 position;
+uniform vec2 u_offset;
+uniform float u_scale_y;
+void main() {
+    vec3 p = position;
+    p.y *= u_scale_y;           // scale wick vs body differently if needed
+    p.xy += u_offset;
+    gl_Position = vec4(p.xy, 0.0, 1.0);
+}
+)";
+
+static const char* fs_src = R"(
+#version 330
+uniform vec4 u_color;
+out vec4 frag_color;
+void main() {
+    frag_color = u_color;
+}
+)";
+
+typedef struct {
+    sg_pipeline pip_triangles;
+    sg_pipeline pip_lines;
+    sg_buffer vbuf;
+    sg_buffer ibuf_body;
+    sg_buffer ibuf_wick;
+    sg_bindings bind;
+    sg_pass_action pass_action;
+} app_state_t;
+
+static app_state_t state;
+
+void init(void) {
+    sg_setup(&(sg_desc){
+        .environment = sglue_environment(),
+        .logger.func = slog_func,
+    });
+
+    // --- Vertex data: 7 points ---
+    // 0: open left,  1: open right
+    // 2: close left, 3: close right
+    // 4: center (x=0), 5: high, 6: low
+    float vertices[] = {
+        -0.25f, -0.3f, 0.0f,   // 0: open left
+         0.25f, -0.3f, 0.0f,   // 1: open right
+        -0.25f,  0.5f, 0.0f,   // 2: close left
+         0.25f,  0.5f, 0.0f,   // 3: close right
+         0.0f,   0.0f, 0.0f,   // 4: center
+         0.0f,   0.9f, 0.0f,   // 5: high
+         0.0f,  -0.9f, 0.0f    // 6: low
+    };
+
+    state.vbuf = sg_make_buffer(&(sg_buffer_desc){
+        .data = SG_RANGE(vertices),
+        .label = "candlestick-vertices"
+    });
+
+    // Indices for body (quad → two triangles)
+    uint16_t body_indices[] = { 0, 1, 2,  2, 1, 3 };
+    state.ibuf_body = sg_make_buffer(&(sg_buffer_desc){
+        .type = SG_BUFFERTYPE_INDEXBUFFER,
+        .data = SG_RANGE(body_indices),
+        .label = "body-indices"
+    });
+
+    // Indices for wick (two lines: high and low from center)
+    uint16_t wick_indices[] = { 4, 5,   4, 6 };
+    state.ibuf_wick = sg_make_buffer(&(sg_buffer_desc){
+        .type = SG_BUFFERTYPE_INDEXBUFFER,
+        .data = SG_RANGE(wick_indices),
+        .label = "wick-indices"
+    });
+
+    // Shader
+    sg_shader shd = sg_make_shader(&(sg_shader_desc){
+        .vs = {
+            .uniform_blocks[0] = {
+                .size = sizeof(float) * (2 + 1 + 1), // offset + scale_y + padding
+                .uniforms = {
+                    [0] = { .name = "u_offset", .type = SG_UNIFORMTYPE_FLOAT2 },
+                    [1] = { .name = "u_scale_y", .type = SG_UNIFORMTYPE_FLOAT }
+                }
+            },
+            .source = vs_src
+        },
+        .fs = {
+            .uniform_blocks[0] = {
+                .size = sizeof(float)*4,
+                .uniforms = { [0] = { .name = "u_color", .type = SG_UNIFORMTYPE_FLOAT4 } }
+            },
+            .source = fs_src
+        }
+    });
+
+    // Pipeline for body (filled)
+    state.pip_triangles = sg_make_pipeline(&(sg_pipeline_desc){
+        .layout.attrs[0].format = SG_VERTEXFORMAT_FLOAT3,
+        .shader = shd,
+        .index_type = SG_INDEXTYPE_UINT16,
+        .cull_mode = SG_CULLMODE_NONE,
+        .colors[0].blend = {
+            .enabled = true,
+            .src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+            .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
+        },
+        .label = "candlestick-body-pipeline"
+    });
+
+    // Pipeline for wick (lines)
+    state.pip_lines = sg_make_pipeline(&(sg_pipeline_desc){
+        .layout.attrs[0].format = SG_VERTEXFORMAT_FLOAT3,
+        .shader = shd,
+        .primitive_type = SG_PRIMITIVETYPE_LINES,
+        .index_type = SG_INDEXTYPE_UINT16,
+        .cull_mode = SG_CULLMODE_NONE,
+        .label = "candlestick-wick-pipeline"
+    });
+
+    // Shared bindings
+    state.bind.vertex_buffers[0] = state.vbuf;
+
+    state.pass_action.colors[0] = { .load_action = SG_LOADACTION_CLEAR, .clear_value = {0.1f, 0.1f, 0.15f, 1.0f} };
+}
+
+void frame(void) {
+    sg_begin_pass(&(sg_pass){
+        .action = state.pass_action,
+        .swapchain = sglue_swapchain()
+    });
+
+    float offset_x = 0.0f;
+    float offset_y = 0.0f;
+
+    // === Draw bullish candle body (green) ===
+    sg_apply_pipeline(state.pip_triangles);
+    STATE.bind.index_buffer = state.ibuf_body;
+    sg_apply_bindings(&state.bind);
+
+    sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &SG_RANGE((float[4]){ offset_x, offset_y, 1.0f, 0.0f }));
+    sg_apply_uniforms(SG_SHADERSTAGE_FS, 0, &SG_RANGE((float[4]){ 0.0f, 0.8f, 0.3f, 0.7f })); // green translucent
+    sg_draw(0, 6, 1);
+
+    // === Draw wick (thin black line) ===
+    sg_apply_pipeline(state.pip_lines);
+    state.bind.index_buffer = state.ibuf_wick;
+    sg_apply_bindings(&state.bind);
+
+    sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &SG_RANGE((float[4]){ offset_x, offset_y, 1.0f, 0.0f }));
+    sg_apply_uniforms(SG_SHADERSTAGE_FS, 0, &SG_RANGE((float[4]){ 0.9f, 0.9f, 0.9f, 1.0f })); // white wick
+    sg_draw(0, 4, 1);  // 4 indices = 2 lines
+
+    sg_end_pass();
+    sg_commit();
+}
+```
+
+### Summary: You cannot do it in **one** `sg_draw()` call easily, but:
+
+**2 draw calls per candlestick** is:
+- Extremely efficient
+- Standard practice in finance charting (TradingView, Thinkorswim, etc.)
+- Clean, readable, and GPU-friendly
+
+### To render 1000 candles efficiently:
+Use **instancing** with per-instance offset + color + open/close/high/low uniforms → then yes, **2 draw calls for 1000 candles**!
+
+Let me know if you want the **instanced version** that renders hundreds of candles in just 2 draw calls total. That's the real high-performance solution.
