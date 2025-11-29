@@ -10,7 +10,7 @@
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
 #include "header/sokol_time.h"
-#include "header/3-attributes.glsl.h"
+#include "header/2-uniforms.glsl.h"
 
 using namespace std;
 
@@ -31,10 +31,10 @@ static void init (void) {
 
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
-	 /* positions         	colors*/
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // bottom left, red
-    0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,    // bottom right, green
-    0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f     // top, blue
+	 // positions
+    -0.5f, -0.5f, 0.0f,     // bottom left
+    0.5f, -0.5f, 0.0f,      // bottom right
+    0.0f,  0.5f, 0.0f       // top
 	};
 	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
@@ -47,8 +47,7 @@ static void init (void) {
 		.shader = shd,
 		.layout = {
 			.attrs = {
-				[0] = {.format = SG_VERTEXFORMAT_FLOAT3},
-				[1] = {.format = SG_VERTEXFORMAT_FLOAT3}
+				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
 			}
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
@@ -70,14 +69,14 @@ void frame(void) {
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 
-//	float now = (float) stm_sec(stm_now());
-//	float greenValue = (sinf(now)/2.0f);	
-//	cout<<fixed<<setprecision(6)<<now<<endl;
-//	fs_params_t fs_params = {
-//		.ourColor = {0.1f, greenValue, 0.0f, 1.0f}
-//	};
-//	sg_range range = {&fs_params, sizeof(fs_params)};
-//	sg_apply_uniforms(UB_fs_params, range); 
+	float now = (float) stm_sec(stm_now());
+	float greenValue = (sinf(now)/2.0f);	
+	cout<<fixed<<setprecision(6)<<now<<endl;
+	fs_params_t fs_params = {
+		.ourColor = {0.1f, greenValue, 0.0f, 1.0f}
+	};
+	sg_range range = {&fs_params, sizeof(fs_params)};
+	sg_apply_uniforms(UB_fs_params, range); 
 
 	sg_draw(0, 3, 1);
 
