@@ -7,7 +7,7 @@
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
-#include "header/1-in-out.glsl.h"
+#include "header/2-uniforms.glsl.h"
 
 static struct {
 	sg_pipeline pip;
