@@ -3,14 +3,12 @@
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
 
-#include "iostream"
-#include "iomanip"
 #include "header/sokol_app.h"
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
-#include "header/sokol_time.h"
-#include "header/3-attributes.glsl.h"
+#include "header/2-uniforms-translate.glsl.h"
+#include "header/HandmadeMath.h"
 
 using namespace std;
 
@@ -27,14 +25,13 @@ static void init (void) {
 	};
 	sg_setup(&desc);
 
-	stm_setup(); // setup sokol_time
 
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
-	 /* positions         	colors*/
-    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // bottom left, red
-    0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,    // bottom right, green
-    0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f     // top, blue
+	 /* positions         	*/
+    -0.5f, -0.5f, 0.0f,   // bottom left
+    0.5f, -0.5f, 0.0f,    // bottom right
+    0.0f,  0.5f, 0.0f	  	// top
 	};
 	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
@@ -47,8 +44,7 @@ static void init (void) {
 		.shader = shd,
 		.layout = {
 			.attrs = {
-				[0] = {.format = SG_VERTEXFORMAT_FLOAT3},
-				[1] = {.format = SG_VERTEXFORMAT_FLOAT3}
+				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
 			}
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
@@ -61,26 +57,27 @@ static void init (void) {
 }
 
 void frame(void) {
+	HMM_Mat4 rotate = HMM_Rotate_RH(HMM_AngleDeg(90.0f), HMM_V3(0.0f, 0.0f, 1.0f));
+	HMM_Mat4 scale = HMM_Scale(HMM_V3(0.5f, 0.5f, 1.0f));
+	HMM_Mat4 _transform = HMM_MulM4(rotate, scale);
+
 	sg_pass pass {
 		.action = state.pass_action,
 		.swapchain = sglue_swapchain()
 	};
 	sg_begin_pass(&pass);
-
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 
-//	float now = (float) stm_sec(stm_now());
-//	float greenValue = (sinf(now)/2.0f);	
-//	cout<<fixed<<setprecision(6)<<now<<endl;
-//	fs_params_t fs_params = {
-//		.ourColor = {0.1f, greenValue, 0.0f, 1.0f}
-//	};
-//	sg_range range = {&fs_params, sizeof(fs_params)};
-//	sg_apply_uniforms(UB_fs_params, range); 
+	vs_params_t vs_params = {
+		.transform = _transform
+	};
+	sg_apply_uniforms(
+
+
+
 
 	sg_draw(0, 3, 1);
-
 	sg_end_pass();
 	sg_commit();
 }
