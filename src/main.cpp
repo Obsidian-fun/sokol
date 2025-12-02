@@ -1,4 +1,5 @@
-/* shaders - in and out , part 1*/
+/* rotating and scaling a triangle*/
+
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
@@ -7,8 +8,8 @@
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
-#include "header/2-uniforms-translate.glsl.h"
 #include "header/HandmadeMath.h"
+#include "header/transformations.glsl.h"
 
 using namespace std;
 
@@ -24,7 +25,6 @@ static void init (void) {
 		.environment = sglue_environment()
 	};
 	sg_setup(&desc);
-
 
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
@@ -72,10 +72,8 @@ void frame(void) {
 	vs_params_t vs_params = {
 		.transform = _transform
 	};
-	sg_apply_uniforms(
-
-
-
+	sg_range range = {&vs_params, sizeof(vs_params)};
+	sg_apply_uniforms(UB_vs_params, range);
 
 	sg_draw(0, 3, 1);
 	sg_end_pass();
