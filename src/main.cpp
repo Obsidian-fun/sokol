@@ -10,6 +10,7 @@
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
+#include "header/sokol_time.h"
 
 #include "header/transformations.glsl.h"
 
@@ -20,6 +21,8 @@ static struct {
 } state;
 
 static void init (void) {
+	stm_setup(); // setup sokol time
+
 	sg_desc desc = {
 		.logger = {.func = slog_func},
 		.environment = sglue_environment()
@@ -74,9 +77,9 @@ static void init (void) {
 }
 
 void frame(void) {
-	HMM_Mat4 rotate = HMM_Rotate_RH(HMM_AngleDeg(45.0f), HMM_V3(0.0f, 0.0f, 1.0f));
-	HMM_Mat4 scale = HMM_Scale(HMM_V3(0.5f, 0.5f, 0.5f));
-	HMM_Mat4 trans = HMM_MulM4(rotate, scale);
+	HMM_Mat4 translate = HMM_Translate(HMM_V3(0.5f, -0.5f, 1.0f));
+	HMM_Mat4 rotate = HMM_Rotate_RH(HMM_AngleRad((float)stm_sec(stm_now())), HMM_V3(0.0f, 0.0f, 1.0f));
+	HMM_Mat4 trans = HMM_MulM4(rotate, translate);
 
 	sg_pass pass {
 		.action = state.pass_action,
