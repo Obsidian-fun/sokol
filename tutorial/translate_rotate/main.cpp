@@ -77,6 +77,9 @@ static void init (void) {
 }
 
 void frame(void) {
+	HMM_Mat4 translate = HMM_Translate(HMM_V3(0.5f, -0.5f, 1.0f));
+	HMM_Mat4 rotate = HMM_Rotate_RH(HMM_AngleRad((float)stm_sec(stm_now())), HMM_V3(0.0f, 0.0f, 1.0f));
+	HMM_Mat4 trans = HMM_MulM4(translate, rotate);
 
 	sg_pass pass {
 		.action = state.pass_action,
@@ -86,6 +89,11 @@ void frame(void) {
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 
+	vs_params_t vs_params = {
+		.transform = trans
+	};
+	sg_range range = {&vs_params, sizeof(vs_params)};
+	sg_apply_uniforms(UB_vs_params, range);
 
 	sg_draw(0, 6, 1);
 	sg_end_pass();
