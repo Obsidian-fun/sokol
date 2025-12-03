@@ -1,4 +1,4 @@
-/* rotating and scaling a triangle*/
+/* creating offsets using uniforms */
 #define HANDMADE_MATH_IMPLEMENTATION
 #include "header/HandmadeMath.h"
 
