@@ -1,4 +1,4 @@
-@ctype mat4 HMM_Mat4
+@ctype mat4 HMM_Mat4 
 
 @vs vs
 in vec3 position;

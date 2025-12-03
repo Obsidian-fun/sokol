@@ -1,4 +1,6 @@
 /* rotating and scaling a triangle*/
+#define HANDMADE_MATH_IMPLEMENTATION
+#include "header/HandmadeMath.h"
 
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
@@ -8,10 +10,8 @@
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
-#include "header/HandmadeMath.h"
-#include "header/transformations.glsl.h"
 
-using namespace std;
+#include "header/transformations.glsl.h"
 
 static struct {
 	sg_pipeline pip;
@@ -59,7 +59,7 @@ static void init (void) {
 void frame(void) {
 	HMM_Mat4 rotate = HMM_Rotate_RH(HMM_AngleDeg(90.0f), HMM_V3(0.0f, 0.0f, 1.0f));
 	HMM_Mat4 scale = HMM_Scale(HMM_V3(0.5f, 0.5f, 1.0f));
-	HMM_Mat4 _transform = HMM_MulM4(rotate, scale);
+	HMM_Mat4 trans = HMM_MulM4(rotate, scale);
 
 	sg_pass pass {
 		.action = state.pass_action,
@@ -70,7 +70,7 @@ void frame(void) {
 	sg_apply_bindings(&state.bind);
 
 	vs_params_t vs_params = {
-		.transform = _transform
+		.transform = trans
 	};
 	sg_range range = {&vs_params, sizeof(vs_params)};
 	sg_apply_uniforms(UB_vs_params, range);
