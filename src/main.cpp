@@ -40,6 +40,21 @@ static void init (void) {
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
 
+	uint16_t indices[] = {
+		0,1,3,
+		1,2,3
+	}
+	buffer_desc = {
+		.size = sizeof(indices),
+		.usage = {
+			.index_buffer = true,
+			.immutable = true,
+		},
+		.data = SG_RANGE(indices),
+		.label = "quad_indices"
+	};
+	state.bind.index_buffer = sg_make_buffer(&buffer_desc);
+
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
 		.layout = {
