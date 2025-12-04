@@ -1,4 +1,4 @@
-/* creating offsets using uniforms */
+/* creating instanced offsets using uniforms */
 #define HANDMADE_MATH_IMPLEMENTATION
 #include "header/HandmadeMath.h"
 
@@ -12,7 +12,7 @@
 #include "header/sokol_log.h"
 #include "header/sokol_time.h"
 
-#include "header/transformations.glsl.h"
+#include "header/" //insert shader
 
 static struct {
 	sg_pipeline pip;
@@ -68,7 +68,7 @@ static void init (void) {
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
 		.index_type = SG_INDEXTYPE_UINT16,
-		.label = "triangle_position"
+		.label = "quad_position"
 	};
 	state.pip = sg_make_pipeline(&pipeline_desc); 
 	state.pass_action = (sg_pass_action){};
