@@ -11,7 +11,6 @@
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
 #include "header/sokol_time.h"
-
 #include "header/1-instancing.h" //insert shader
 
 static struct {
@@ -65,10 +64,14 @@ static void init (void) {
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
 
 	int index = 0; 
-	
-
-
-
+	float offset = 0.0f;
+	for (int y=-10; y<10; y +=2) {
+		for (int x=-10; x<10; x+=2) {
+			float x_pos = (float)x /10.0f + offset;
+			float y_post = (float)y /10.0f + offset;
+			state.translations[index++] = HMM_V4(x_pos, y_pos, 0.0, 0.0); 
+		}
+	}
 }
 
 void frame(void) {
@@ -81,8 +84,11 @@ void frame(void) {
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
 
+	vs_params_t vs_params;
+	std::memcpy(vs_params.offsets, state.translations, sizeof(vs_params.offsets));
+	sg_apply_uniforms(UB_vs_params, &SG_RANGE(vs_params));
 
-	sg_draw(0, 6, 1);
+	sg_draw(0, 6, 100);
 	sg_end_pass();
 	sg_commit();
 }

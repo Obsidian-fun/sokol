@@ -1,4 +1,4 @@
-
+@ctype vec HMM_Vec4
 @vs vs
 
 
