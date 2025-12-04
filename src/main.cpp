@@ -12,12 +12,13 @@
 #include "header/sokol_log.h"
 #include "header/sokol_time.h"
 
-#include "header/" //insert shader
+#include "header/1-instancing.h" //insert shader
 
 static struct {
 	sg_pipeline pip;
 	sg_bindings bind;
 	sg_pass_action pass_action;
+	HMM_Vec4 translations[100];
 } state;
 
 static void init (void) {
@@ -32,10 +33,13 @@ static void init (void) {
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
 	 /* positions         	*/
-    -0.5f, -0.7f, 0.0f,   // bottom left
-    0.5f, -0.7f, 0.0f,    // bottom right
-    0.5f,  0.7f, 0.0f,	  // top right
-		-0.5f, 0.7f, 0.0f			// top left
+    -0.05f, -0.07f, 0.0f,   // bottom left
+    0.05f, -0.07f, 0.0f,    // bottom right
+    0.05f,  0.07f, 0.0f,	  // top right
+													//
+		-0.05f, -0.07f, 0.0f,		// bottom left
+    0.05f,  0.07f, 0.0f,	  // top right
+		-0.05f, 0.07f, 0.0f			// top left
 	};
 	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
@@ -43,21 +47,6 @@ static void init (void) {
 		.label = "quad_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_desc);
-	// inddex buffer information,
-	uint16_t indices[] = {
-		0,1,3,
-		1,2,3
-	};
-	buffer_desc = {
-		.size = sizeof(indices),
-		.usage = {
-			.index_buffer = true,
-			.immutable = true,
-		},
-		.data = SG_RANGE(indices),
-		.label = "quad_indices"
-	};
-	state.bind.index_buffer = sg_make_buffer(&buffer_desc);
 
 	sg_pipeline_desc pipeline_desc = {
 		.shader = shd,
@@ -74,6 +63,12 @@ static void init (void) {
 	state.pass_action = (sg_pass_action){};
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
+
+	int index = 0; 
+	
+
+
+
 }
 
 void frame(void) {
