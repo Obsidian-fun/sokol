@@ -51,7 +51,7 @@ static void init (void) {
 		.shader = shd,
 		.layout = {
 			.attrs = {
-				[0] = {.format = SG_VERTEXFORMAT_FLOAT3}
+				[0] = {.format = SG_VERTEXFORMAT_FLOAT2}
 			}
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
