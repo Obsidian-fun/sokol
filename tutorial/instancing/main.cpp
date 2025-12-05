@@ -68,8 +68,8 @@ static void init (void) {
 	float offset = 0.1f;
 		for (int y=-10; y<10; y+=2) {
 			for (int x=-10; x<10; x+=2) {
-				float x_pos = (float)x /10.0f + offset;
-				float y_pos = (float)y /10.0f + offset;
+				float x_pos = (float)x /10.0f + offset; // increasing 10.0f to 20.0f will tightly cluster the squares on x
+				float y_pos = (float)y /10.0f + offset; // increasing 10.0f to 20.0f will tightly cluster the squares on y 
 				state.translations[index++] = HMM_V4(x_pos, y_pos, 0.0, 0.0); 
 			}
 		}
