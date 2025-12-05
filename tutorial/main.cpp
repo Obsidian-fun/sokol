@@ -66,8 +66,10 @@ static void init (void) {
 
 	int index = 0; 
 	float offset = 0.0f;
+	for (int y=-10; y<10; y +=2) {
 		for (int x=-10; x<10; x+=2) {
 			float x_pos = (float)x /10.0f + offset;
+			float y_pos = (float)y /10.0f + offset;
 			state.translations[index++] = HMM_V4(x_pos, y_pos, 0.0, 0.0); 
 		}
 	}
