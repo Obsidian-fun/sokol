@@ -1,4 +1,4 @@
-/* creating instanced offsets using uniforms */
+/* camera lookat */ 
 #define HANDMADE_MATH_IMPLEMENTATION
 #include "header/HandmadeMath.h"
 
@@ -12,13 +12,12 @@
 #include "header/sokol_log.h"
 #include "header/sokol_time.h"
 #include "header/1-instancing.glsl.h" //insert shader
-#include "string.h"
+
 
 static struct {
 	sg_pipeline pip;
 	sg_bindings bind;
 	sg_pass_action pass_action;
-	HMM_Vec4 translations[100];
 } state;
 
 static void init (void) {
@@ -33,15 +32,15 @@ static void init (void) {
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));	
 	float vertices[] = {
 	 /* positions         	*/
-    -0.05f, 0.05f,    	// top left
-    0.05f, -0.05f,     // bottom right
+    -0.05f, 0.05f,    // top left
+    0.05f, -0.05f,    // bottom right
     -0.05f,  -0.05f,	// bottom left
 
 		-0.05f, 0.05f, 		// top left
-		0.05f, -0.05f, 			// bottom right
-    0.05f,  0.05f   // top right
-
+		0.05f, -0.05f, 		// bottom right
+    0.05f,  0.05f   	// top right
 	};
+
 	sg_buffer_desc buffer_desc = { // loading up vertex data from buffer object
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
