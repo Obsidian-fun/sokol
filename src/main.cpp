@@ -1,4 +1,4 @@
-/* camera lookat */ 
+/* instanced arrays */
 #define HANDMADE_MATH_IMPLEMENTATION
 #include "header/HandmadeMath.h"
 
@@ -10,7 +10,6 @@
 #include "header/sokol_gfx.h"
 #include "header/sokol_glue.h"
 #include "header/sokol_log.h"
-#include "header/sokol_time.h"
 #include "header/1-instancing.glsl.h" //insert shader
 
 
@@ -21,7 +20,6 @@ static struct {
 } state;
 
 static void init (void) {
-	stm_setup(); // setup sokol time
 
 	sg_desc desc = {
 		.logger = {.func = slog_func},
@@ -63,13 +61,14 @@ static void init (void) {
 	state.pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
 	state.pass_action.colors[0].clear_value = {0.2f, 0.3f, 0.3f, 1.0f};
 
+	HMM_V2 translation[100];
 	int index = 0; 
 	float offset = 0.1f;
 		for (int y=-10; y<10; y+=2) {
 			for (int x=-10; x<10; x+=2) {
 				float x_pos = (float)x /10.0f + offset;
 				float y_pos = (float)y /10.0f + offset;
-				state.translations[index++] = HMM_V4(x_pos, y_pos, 0.0, 0.0); 
+				translations[index++] = HMM_V2(x_pos, y_pos);
 			}
 		}
 }
