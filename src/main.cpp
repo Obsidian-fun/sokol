@@ -1,4 +1,4 @@
-/* Renders a triangle */
+/*Generating a 1-8-1 plane */
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
@@ -23,16 +23,16 @@ static void init (void) {
 		.environment = sglue_environment()
 	};
 	sg_setup(&desc);
-
- /* create shader from code-generated sg_shader_desc */
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
 
- /* a vertex buffer with 3 vertices */
 	float vertices[] = {
 		/*postion */						
-		-0.5f,-0.5f, 0.0f, 	// bottom left
-		0.5f, -0.5f, 0.0f,	// bottom right
-		0.0f, 0.5f, 0.0f		// top 
+		0.5f, 0.5f, 0.0f,			1.0f, 1.0f,		//
+		0.5f, -0.5f, 0.0f,		1.0f, 1.0f,		//
+		-0.5f, -0.5f, 0.0f,  	1.0f, 1.0f,		//
+		-0.5f, 0.5f, 0.0f, 		1.0f, 1.0f		//
+
+
 	};
 
 	sg_buffer_desc buffer_description = {
@@ -41,10 +41,8 @@ static void init (void) {
 		.label = "triangle_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_description);
-	/*create a pipeline object (default render states are fine for triangle) */
 	sg_pipeline_desc pipeline_description =  {
 		.shader = shd,
-			/*if the vertex layout doesn't have gaps, don't need to provide strides and offsets */
 		.layout = {
 			.attrs = {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3 }
@@ -92,7 +90,7 @@ sapp_desc sokol_main(int argc, char *argv[]) {
 		.width = 800,
 		.height = 600,
 		.high_dpi = true,
-		.window_title = "First Triangle"
+		.window_title = "Coordinate systems"
 	};
 }
 
