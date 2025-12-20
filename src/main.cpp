@@ -80,10 +80,16 @@ void frame (void) {
 	*/
 	HMM_Mat4 model = HMM_Rotate_RH(HMM_AngleDeg(-55.0f), HMM_V3(1.0f, 0.0f, 0.0f));
 	HMM_Mat4 view = HMM_Translate(HMM_V3(0.0f, 0.0f, -3.0f));
-	HMM_Mat4 projection = HMM_Perspective_RH_NO(
+	HMM_Mat4 projection = HMM_Perspective_RH_NO(45.0f, sapp_width()/sapp_height(), 0.1f, 100.0f);
 
+	vs_params_t vs_params = {
+		.model = model,
+		.view = view,
+		.projection = projection
+	};
 
-
+	sg_range range = {&vs_params, sizeof(vs_params)};
+	sg_apply_uniforms(UB_vs_params, range );
 
 	sg_pass pass = {
 		.action = state.pass_action,
