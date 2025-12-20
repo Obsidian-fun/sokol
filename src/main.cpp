@@ -28,11 +28,11 @@ static void init (void) {
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
 	// vertex buffer
 	float vertices[] = {
-		/*postion 						texture cords */						
-		0.5f, 0.5f, 0.0f,			1.0f, 1.0f,		// top right 
-		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		// bottom right
-		-0.5f, -0.5f, 0.0f,  	0.0f, 0.0f,		// bottom left
-		-0.5f, 0.5f, 0.0f, 		0.0f, 1.0f		// top left
+		/*postion 					*/	
+		0.5f, 0.5f, 0.0f,		// top right 
+		0.5f, -0.5f, 0.0f,	// bottom right
+		-0.5f, -0.5f, 0.0f, // bottom left
+		-0.5f, 0.5f, 0.0f 	// top left
 	};
 	sg_buffer_desc buffer_description = {
 		.size = sizeof(vertices),
@@ -45,11 +45,14 @@ static void init (void) {
 	uint16_t indices[] = {
 		0, 1, 3,
 		1, 2, 3
-	}
+	};
 	buffer_description = {}; // reset
 	buffer_description = {
-		.type = SG_BUFFERTYPE_INDEXBUFFER,
 		.size = sizeof(indices),
+		.usage = {
+			.index_buffer = true,
+			.immutable = true
+		},
 		.data = SG_RANGE(indices),
 		.label = "quad_indices"
 	};
@@ -62,6 +65,7 @@ static void init (void) {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3 }
 			}
 		},
+		.index_type = SG_INDEXTYPE_UINT16,
 		.label = "quad-pipeline"
 	};
 	state.pip = sg_make_pipeline(&pipeline_description);
@@ -71,6 +75,14 @@ static void init (void) {
 }
 
 void frame (void) {
+	sg_pass pass = {
+		.action = state.pass_action,
+		.swapchain = sglue_swapchain()
+	};
+	sg_begin_pass(&pass); 
+	sg_apply_pipeline(state.pip);
+	sg_apply_bindings(&state.bind);
+
 	/***
 	 * HandMadeMath naming convention for matrice functions,
 	 * RH - Right handed coordinate system
@@ -89,15 +101,8 @@ void frame (void) {
 	};
 
 	sg_range range = {&vs_params, sizeof(vs_params)};
-	sg_apply_uniforms(UB_vs_params, range );
+	sg_apply_uniforms(UB_vs_params, range);
 
-	sg_pass pass = {
-		.action = state.pass_action,
-		.swapchain = sglue_swapchain()
-	};
-	sg_begin_pass(&pass); 
-	sg_apply_pipeline(state.pip);
-	sg_apply_bindings(&state.bind);
 	sg_draw(0,6,1); // sg_draw(int base_element, int num_elements, int num_instances) 
 	sg_end_pass();
 	sg_commit();

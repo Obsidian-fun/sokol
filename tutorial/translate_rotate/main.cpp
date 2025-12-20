@@ -1,4 +1,4 @@
-/* rotating and scaling a triangle*/
+/* rotating and scaling a quad*/
 #define HANDMADE_MATH_IMPLEMENTATION
 #include "header/HandmadeMath.h"
 
@@ -68,7 +68,7 @@ static void init (void) {
 		},
 		.primitive_type = SG_PRIMITIVETYPE_TRIANGLES,
 		.index_type = SG_INDEXTYPE_UINT16,
-		.label = "triangle_position"
+		.label = "quad_pipeline"
 	};
 	state.pip = sg_make_pipeline(&pipeline_desc); 
 	state.pass_action = (sg_pass_action){};
