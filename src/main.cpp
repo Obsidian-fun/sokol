@@ -55,8 +55,6 @@ static void init (void) {
 	};
 	state.bind.index_buffer = sg_make_buffer(&buffer_description);
 
-
-
 	sg_pipeline_desc pipeline_description =  {
 		.shader = shd,
 		.layout = {
@@ -64,7 +62,7 @@ static void init (void) {
 				[0] = {.format = SG_VERTEXFORMAT_FLOAT3 }
 			}
 		},
-		.label = "triangle-pipeline"
+		.label = "quad-pipeline"
 	};
 	state.pip = sg_make_pipeline(&pipeline_description);
 	state.pass_action = (sg_pass_action){};
@@ -73,6 +71,20 @@ static void init (void) {
 }
 
 void frame (void) {
+	/***
+	 * HandMadeMath naming convention for matrice functions,
+	 * RH - Right handed coordinate system
+	 * LH - Left handed coordinate system
+	 * NO - Negative one to one [-1,1]
+	 * ZO - Zero to one [0,1]
+	*/
+	HMM_Mat4 model = HMM_Rotate_RH(HMM_AngleDeg(-55.0f), HMM_V3(1.0f, 0.0f, 0.0f));
+	HMM_Mat4 view = HMM_Translate(HMM_V3(0.0f, 0.0f, -3.0f));
+	HMM_Mat4 projection = HMM_Perspective_RH_NO(
+
+
+
+
 	sg_pass pass = {
 		.action = state.pass_action,
 		.swapchain = sglue_swapchain()
@@ -80,7 +92,7 @@ void frame (void) {
 	sg_begin_pass(&pass); 
 	sg_apply_pipeline(state.pip);
 	sg_apply_bindings(&state.bind);
-	sg_draw(0,3,1); // sg_draw(int base_element, int num_elements, int num_instances) 
+	sg_draw(0,6,1); // sg_draw(int base_element, int num_elements, int num_instances) 
 	sg_end_pass();
 	sg_commit();
 }
