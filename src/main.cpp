@@ -1,15 +1,17 @@
 /*Generating a 1-8-1 plane */
+
+#define HANDMADE_MATH_IMPLEMENTATION
+#include "header/HandmadeMath.h"
+
 #define SOKOL_IMPL
 #define SOKOL_GFX_IMPL
 #define SOKOL_GLCORE
 
-#include "sokol_app.h"
-#include "sokol_gfx.h"
-#include "sokol_glue.h"
-#include "sokol_log.h"
-#include "1-triangle.glsl.h"
-
-using namespace std;
+#include "header/sokol_app.h"
+#include "header/sokol_gfx.h"
+#include "header/sokol_glue.h"
+#include "header/sokol_log.h"
+#include "header/shaders.glsl.h"
 
 static struct {
 	sg_pipeline pip; 
@@ -24,23 +26,37 @@ static void init (void) {
 	};
 	sg_setup(&desc);
 	sg_shader shd = sg_make_shader(simple_shader_desc(sg_query_backend()));
-
+	// vertex buffer
 	float vertices[] = {
-		/*postion */						
-		0.5f, 0.5f, 0.0f,			1.0f, 1.0f,		//
-		0.5f, -0.5f, 0.0f,		1.0f, 1.0f,		//
-		-0.5f, -0.5f, 0.0f,  	1.0f, 1.0f,		//
-		-0.5f, 0.5f, 0.0f, 		1.0f, 1.0f		//
-
-
+		/*postion 						texture cords */						
+		0.5f, 0.5f, 0.0f,			1.0f, 1.0f,		// top right 
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		// bottom right
+		-0.5f, -0.5f, 0.0f,  	0.0f, 0.0f,		// bottom left
+		-0.5f, 0.5f, 0.0f, 		0.0f, 1.0f		// top left
 	};
-
 	sg_buffer_desc buffer_description = {
 		.size = sizeof(vertices),
 		.data = SG_RANGE(vertices),
-		.label = "triangle_vertices"
+		.label = "quad_vertices"
 	};
 	state.bind.vertex_buffers[0] = sg_make_buffer(&buffer_description);
+
+	// index buffer with 2 triangles
+	uint16_t indices[] = {
+		0, 1, 3,
+		1, 2, 3
+	}
+	buffer_description = {}; // reset
+	buffer_description = {
+		.type = SG_BUFFERTYPE_INDEXBUFFER,
+		.size = sizeof(indices),
+		.data = SG_RANGE(indices),
+		.label = "quad_indices"
+	};
+	state.bind.index_buffer = sg_make_buffer(&buffer_description);
+
+
+
 	sg_pipeline_desc pipeline_description =  {
 		.shader = shd,
 		.layout = {
